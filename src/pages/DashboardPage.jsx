@@ -57,7 +57,27 @@ function DashboardPage() {
     }
   };
 
-  const handleVerify = (evidenceId, file) => verifyEvidence(evidenceId, file);
+  const handleVerify = async (record, overrideFile) => {
+    let sourceBlob = overrideFile;
+    let meta = {};
+
+    if (overrideFile) {
+      meta = { fileName: overrideFile.name, fileType: overrideFile.type || 'application/octet-stream' };
+    } else {
+      const asset = await retrieveEvidenceByCid(record.ipfsCid);
+      if (!asset) {
+        throw new Error('Asset not found in session IPFS mirror.');
+      }
+      sourceBlob = asset.blob;
+      meta = { fileName: asset.fileName, fileType: asset.fileType };
+    }
+
+    const verification = await verifyEvidence(record.id, sourceBlob);
+    return {
+      ...verification,
+      ...meta,
+    };
+  };
 
   const handleViewEvidence = async (record) => {
     setViewer({ status: 'loading', record });
