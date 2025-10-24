@@ -352,6 +352,32 @@ button {
   text-decoration: underline;
 }
 
+.search-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.search-input input {
+  width: 100%;
+  padding: 0.65rem 1rem 0.65rem 2.4rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(116, 125, 196, 0.28);
+  background: rgba(7, 14, 31, 0.85);
+  color: rgba(230, 235, 255, 0.85);
+}
+
+.search-input input::placeholder {
+  color: rgba(226, 232, 255, 0.45);
+}
+
+.search-icon {
+  position: absolute;
+  left: 0.8rem;
+  color: rgba(226, 232, 255, 0.5);
+  font-size: 0.85rem;
+}
+
 .upload-zone {
   border-radius: 1.1rem;
   border: 1px dashed rgba(108, 118, 200, 0.55);
@@ -718,6 +744,15 @@ tbody tr:hover td {
   border-radius: 0.75rem;
 }
 
+.ledger-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.2rem;
+}
+
 @media (max-width: 1024px) {
   .workspace {
     grid-template-columns: 100%;
@@ -777,6 +812,11 @@ tbody tr:hover td {
 
   .viewer-body {
     grid-template-columns: 1fr;
+  }
+
+  .ledger-header {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 

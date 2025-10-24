@@ -3,8 +3,31 @@ import EvidenceUpload from '../components/EvidenceUpload.jsx';
 import EvidenceTable from '../components/EvidenceTable.jsx';
 import BatchSummary from '../components/BatchSummary.jsx';
 import TamperVerification from '../components/TamperVerification.jsx';
+import SearchInput from '../components/SearchInput.jsx';
 import { useEvidence } from '../state/EvidenceContext.jsx';
 import { formatIsoTimestamp, formatFileSize } from '../utils/hashUtils.js';
+
+function matchesQuery(value, query) {
+  return String(value ?? '')
+    .toLowerCase()
+    .includes(query.toLowerCase());
+}
+
+function filterEvidence(items, query) {
+  const trimmed = query.trim();
+  if (!trimmed) return items;
+  return items.filter((item) => {
+    const fields = [
+      item.fileName,
+      item.fileType,
+      item.ipfsCid,
+      item.polygonTxHash,
+      item.merkleRoot,
+      item.zkp?.proofId,
+    ];
+    return fields.some((field) => matchesQuery(field, trimmed));
+  });
+}
 
 function DashboardPage() {
   const {
@@ -19,6 +42,7 @@ function DashboardPage() {
   const [latestBatch, setLatestBatch] = useState(null);
   const [uploadError, setUploadError] = useState('');
   const [viewer, setViewer] = useState({ status: 'idle' });
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleUpload = async (files) => {
     try {
@@ -60,6 +84,11 @@ function DashboardPage() {
       fileCount: latestBatch.fileCount,
     };
   }, [latestBatch]);
+
+  const filteredEvidence = useMemo(
+    () => filterEvidence(allEvidence, searchQuery),
+    [allEvidence, searchQuery],
+  );
 
   return (
     <>
@@ -122,8 +151,15 @@ function DashboardPage() {
       </div>
 
       <section className="card">
-        <h2>Evidence Ledger</h2>
-        <EvidenceTable evidence={allEvidence} onView={handleViewEvidence} />
+        <div className="ledger-header">
+          <h2>Evidence Ledger</h2>
+          <SearchInput
+            value={searchQuery}
+            onChange={setSearchQuery}
+            placeholder="Search filename, CID, Merkle root, tx hash, or proof ID"
+          />
+        </div>
+        <EvidenceTable evidence={filteredEvidence} onView={handleViewEvidence} />
       </section>
 
       {viewer.status !== 'idle' && (
@@ -136,7 +172,7 @@ function DashboardPage() {
           </div>
           {viewer.status === 'loading' && (
             <p className="section-subtitle">
-              Querying session-local IPFS mirror for CID {viewer.record.ipfsCid}…
+              Querying session-local IPFS mirror for CID {viewer.record.ipfsCid}...
             </p>
           )}
           {viewer.status === 'error' && (

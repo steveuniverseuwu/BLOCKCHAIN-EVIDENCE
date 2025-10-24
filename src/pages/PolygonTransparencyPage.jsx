@@ -1,6 +1,7 @@
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useEvidence } from '../state/EvidenceContext.jsx';
 import { formatIsoTimestamp } from '../utils/hashUtils.js';
+import SearchInput from '../components/SearchInput.jsx';
 
 function renderDetails(event) {
   if (event.type === 'ANCHOR') {
@@ -30,16 +31,29 @@ function renderDetails(event) {
 
 function PolygonTransparencyPage() {
   const { events } = useEvidence();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const transactions = useMemo(() => {
     const sorted = [...events].sort(
       (a, b) => new Date(b.createdAt ?? 0).getTime() - new Date(a.createdAt ?? 0).getTime(),
     );
-    return sorted.map((event, index) => ({
+    const filtered = sorted.filter((event) => {
+      const query = searchQuery.trim().toLowerCase();
+      if (!query) return true;
+      const targets = [
+        event.polygonTxHash,
+        event.merkleRoot,
+        event.fileName,
+        ...(event.proofIds ?? []),
+        event.type,
+      ];
+      return targets.some((target) => String(target ?? '').toLowerCase().includes(query));
+    });
+    return filtered.map((event, index) => ({
       ...event,
-      sequence: sorted.length - index,
+      sequence: filtered.length - index,
     }));
-  }, [events]);
+  }, [events, searchQuery]);
 
   return (
     <>
@@ -58,7 +72,14 @@ function PolygonTransparencyPage() {
         </div>
       ) : (
         <div className="card">
-          <h2>Activity Feed</h2>
+          <div className="ledger-header">
+            <h2>Activity Feed</h2>
+            <SearchInput
+              value={searchQuery}
+              onChange={setSearchQuery}
+              placeholder="Search txn hash, Merkle root, proof ID, or file"
+            />
+          </div>
           <div className="table-wrapper">
             <table>
               <thead>
