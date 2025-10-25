@@ -13,18 +13,19 @@ Visit `http://localhost:5173`, sign in with any email/password (no backend invol
 
 ### Additional scripts
 
-| Command          | Purpose                                |
-|------------------|----------------------------------------|
-| `npm run build`  | Production build via Vite              |
-| `npm run preview`| Preview the production bundle locally  |
-| `npm run lint`   | ESLint (flat config) over `src/**/*.jsx` |
-| `npm run deploy` | Build + publish `dist/` to the `gh-pages` branch |
+| Command                | Purpose                                                |
+| ---------------------- | ------------------------------------------------------ |
+| `npm run build`        | Production build via Vite                              |
+| `npm run preview`      | Preview the production bundle locally                  |
+| `npm run lint`         | ESLint (flat config) over `src/**/*.jsx`               |
+| `npm run deploy`       | Build + publish `dist/` to the `gh-pages` branch       |
+| `npm run deploy:clean` | Clear the cached `gh-pages` workspace before deploying |
 
 ## Architecture Overview
 
 - **Frontend only (React + Vite)** – No backend services; everything runs in the browser.
 - **Session guard** – Lightweight in-memory auth context that unlocks the console after a local-only email/password submission, plus a mock reset password flow.
-- **Evidence pipeline**: 
+- **Evidence pipeline**:
   1. Client-side SHA-256 hashing with the Web Crypto API.
   2. Merkle tree creation (supports multi-file batches) with proofs stored alongside each leaf.
   3. IPFS CID generation via `multiformats/raw` to mimic pinning while keeping files local.
@@ -49,5 +50,5 @@ Visit `http://localhost:5173`, sign in with any email/password (no backend invol
 The project is pre-configured for GitHub Pages at `https://<your-user>.github.io/BLOCKCHAIN-EVIDENCE/`:
 
 - Vite’s `base` path is set to `/BLOCKCHAIN-EVIDENCE/` and routing uses `HashRouter`, so assets and deep links resolve correctly.
-- Running `npm run deploy` builds the site and pushes the `dist/` output to the `gh-pages` branch via `gh-pages`.
+- Running `npm run deploy` builds the site and pushes the `dist/` output to the `gh-pages` branch via `gh-pages`. The deploy script uses `--add` to avoid Windows command-length limits; run `npm run deploy:clean` first whenever you want to wipe the cached workspace.
 - Enable GitHub Pages in the repo settings, point it at `gh-pages`, and the site will update each time you run the deploy script.
