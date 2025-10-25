@@ -18,6 +18,7 @@ Visit `http://localhost:5173`, sign in with any email/password (no backend invol
 | `npm run build`  | Production build via Vite              |
 | `npm run preview`| Preview the production bundle locally  |
 | `npm run lint`   | ESLint (flat config) over `src/**/*.jsx` |
+| `npm run deploy` | Build + publish `dist/` to the `gh-pages` branch |
 
 ## Architecture Overview
 
@@ -42,3 +43,11 @@ Visit `http://localhost:5173`, sign in with any email/password (no backend invol
 - Replace the Polygon hash stub with an on-chain anchoring service or smart contract call.
 - Swap the synthetic ZKP proof generator with a true verifier (e.g., snarkjs or zk-SNARK service).
 - Persist session data through IndexedDB or a backend API once ready for integration tests.
+
+## GitHub Pages Hosting
+
+The project is pre-configured for GitHub Pages at `https://<your-user>.github.io/BLOCKCHAIN-EVIDENCE/`:
+
+- Vite’s `base` path is set to `/BLOCKCHAIN-EVIDENCE/` and routing uses `HashRouter`, so assets and deep links resolve correctly.
+- Running `npm run deploy` builds the site and pushes the `dist/` output to the `gh-pages` branch via `gh-pages`.
+- Enable GitHub Pages in the repo settings, point it at `gh-pages`, and the site will update each time you run the deploy script.
